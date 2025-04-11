@@ -24,3 +24,11 @@ class Book(models.Model):
     cover = models.SmallIntegerField(choices=Cover.choices, default=Cover.HARD)
     inventory = models.SmallIntegerField(default=0, validators=[MinValueValidator(0)])  # TODO Realize this count
     daily_fee = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0)])
+
+    class Meta:
+        ordering = ["title"]
+        verbose_name = "Book"
+        verbose_name_plural = "Books"
+
+    def __str__(self):
+        return f"Book {self.title}"
