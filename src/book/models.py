@@ -22,5 +22,5 @@ class Book(models.Model):
     title = models.CharField(max_length=100)
     author = models.CharField(max_length=100)
     cover = models.SmallIntegerField(choices=Cover.choices, default=Cover.HARD)
-    inventory = models.SmallIntegerField(default=0, validators=[MinValueValidator(0)]) # TODO Realize this count
+    inventory = models.SmallIntegerField(default=0, validators=[MinValueValidator(0)])  # TODO Realize this count
     daily_fee = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0)])
