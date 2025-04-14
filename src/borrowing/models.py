@@ -17,6 +17,7 @@ class Borrowing(models.Model):
     fee = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     def clean(self):
+        super().clean()
         if self.expected_return_date and self.borrow_date:
             if self.expected_return_date < self.borrow_date:
                 raise ValidationError("Expected return date cannot be earlier than borrow date.")
@@ -31,10 +32,17 @@ class Borrowing(models.Model):
         return Decimal("0.00")
 
     def save(self, *args, **kwargs):
+
+        if self.expected_return_date and self.actual_return_date is None:
+            self.book.inventory -= 1
+        else:
+            self.is_active = False
+            self.book.inventory += 1
+        self.book.clean()
+        self.book.save()
+
         if self.actual_return_date and self.fee is None:
             self.fee = self.calculate_total_fee
-        if self.actual_return_date:
-            self.is_active = False
         super().save(*args, **kwargs)
 
     class Meta:

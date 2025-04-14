@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+from rest_framework.exceptions import ValidationError
 
 
 class Book(models.Model):
@@ -22,7 +23,7 @@ class Book(models.Model):
     title = models.CharField(max_length=100)
     author = models.CharField(max_length=100)
     cover = models.SmallIntegerField(choices=Cover.choices, default=Cover.HARD)
-    inventory = models.SmallIntegerField(default=0, validators=[MinValueValidator(0)])  # TODO Realize this count
+    inventory = models.SmallIntegerField(default=0, validators=[MinValueValidator(0)])
     daily_fee = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0)])
 
     class Meta:
@@ -32,3 +33,8 @@ class Book(models.Model):
 
     def __str__(self):
         return f"Book {self.title}"
+
+    def clean(self):
+        super().clean()
+        if self.inventory < 0:
+            raise ValidationError("Inventory cannot be negative.")
