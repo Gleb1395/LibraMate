@@ -24,7 +24,9 @@ class Book(models.Model):
     author = models.CharField(max_length=100)
     cover = models.SmallIntegerField(choices=Cover.choices, default=Cover.HARD)
     inventory = models.SmallIntegerField(default=0, validators=[MinValueValidator(0)])
-    daily_fee = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0)])
+    daily_fee = models.DecimalField(
+        max_digits=5, decimal_places=2, validators=[MinValueValidator(0)]
+    )
 
     class Meta:
         ordering = ["title"]
@@ -38,3 +40,13 @@ class Book(models.Model):
         super().clean()
         if self.inventory < 0:
             raise ValidationError("Inventory cannot be negative.")
+
+    def increase_inventory(self):
+        self.inventory += 1
+        self.save()
+
+    def decrease_inventory(self):
+        self.inventory -= 1
+        if self.inventory < 0:
+            raise ValidationError("Inventory cannot be negative.")
+        self.save()
