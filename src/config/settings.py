@@ -14,6 +14,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_celery_beat",
     "rest_framework",
     "debug_toolbar",
     "phonenumber_field",
@@ -144,9 +146,7 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.UserRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {"anon": "50/minute", "user": "70/minute"},
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
 }
 # JWT
 SIMPLE_JWT = {
@@ -161,3 +161,18 @@ SIMPLE_JWT = {
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+# TELEGRAM
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+
+# CELERY
+CELERY_BROKER_URL = "redis://redis"
+CELERY_BROKER_BACKEND = "redis://redis"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TASK_SERIALIZER = "json"
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_BEAT_SCHEDULE = {
+    "telegram_notify_task": {
+        "task": "borrowing.tasks.notification_via_telegram.check_overdue_borrowings",
+        "schedule": crontab(minute="*"),
+    }
+}
