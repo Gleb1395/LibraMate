@@ -1,3 +1,58 @@
-from django.shortcuts import render
+from django.utils import timezone
 
-# Create your views here.
+from rest_framework import viewsets, mixins, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+from borrowing.models import Borrowing
+from borrowing.serializers import (
+    BorrowingListSerializer,
+    BorrowingRetrieveSerializer,
+    BorrowingCreateSerializer,
+)
+
+
+class BorrowingView(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = Borrowing.objects.all().select_related("book", "user")
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return BorrowingRetrieveSerializer
+        if self.action == "create":
+            return BorrowingCreateSerializer
+        return BorrowingListSerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+        user_id = self.request.query_params.get("user_id")
+        is_active = self.request.query_params.get("is_active")
+        if user_id is not None:
+            queryset = queryset.filter(user_id=user_id)
+
+        if is_active is not None:
+            if is_active.lower() == "true":
+                queryset = queryset.filter(is_active=True)
+            elif is_active.lower() == "false":
+                queryset = queryset.filter(is_active=False)
+
+        return queryset
+
+    @action(detail=True, methods=["post"])
+    def return_(self, request, pk=None):
+        borrowing = self.get_object()
+        if borrowing.actual_return_date:
+            return Response(
+                {"detail": "Book already returned."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        borrowing.actual_return_date = timezone.now().date()
+        borrowing.is_active = False
+        borrowing.book.increase_inventory()
+        borrowing.book.save()
+        borrowing.save()
+        return Response({"detail": "Book returned successfully."}, status=200)
