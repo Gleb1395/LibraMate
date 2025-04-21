@@ -1,21 +1,19 @@
 from django.utils import timezone
-
-from rest_framework import viewsets, mixins, status
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from borrowing.models import Borrowing
-from borrowing.serializers import (
-    BorrowingListSerializer,
-    BorrowingRetrieveSerializer,
-    BorrowingCreateSerializer,
-)
+from borrowing.serializers import (BorrowingCreateSerializer,
+                                   BorrowingListSerializer,
+                                   BorrowingRetrieveSerializer)
 
 
 class BorrowingView(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
     viewsets.GenericViewSet,
 ):
     queryset = Borrowing.objects.all().select_related("book", "user")
