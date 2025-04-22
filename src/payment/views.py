@@ -1,7 +1,7 @@
 import stripe
 from django.db import transaction
 from django.db.transaction import atomic
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views import View
@@ -26,9 +26,7 @@ class CreateCheckoutSessionView(APIView):
         except Borrowing.DoesNotExist as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        exist_payment = Payment.objects.filter(
-            status=Payment.Status.PENDING, borrowing=borrowing
-        ).first()
+        exist_payment = Payment.objects.filter(status=Payment.Status.PENDING, borrowing=borrowing).first()
         if exist_payment:
             return Response(
                 {
@@ -54,12 +52,10 @@ class CreateCheckoutSessionView(APIView):
                     }
                 ],
                 mode="payment",
-                success_url=request.build_absolute_uri(
-                    reverse("payment:payment_success")
-                )
-                + "?session_id={CHECKOUT_SESSION_ID}",
+                success_url=request.build_absolute_uri(reverse("payment:payment_success"))
+                + "?session_id={CHECKOUT_SESSION_ID}",  # NOQA W503
                 cancel_url=request.build_absolute_uri(reverse("payment:payment_cancel"))
-                + "?session_id={CHECKOUT_SESSION_ID}",
+                + "?session_id={CHECKOUT_SESSION_ID}",  # NOQA W503
                 metadata={
                     "borrowing_id": borrowing.id,
                 },
@@ -73,9 +69,7 @@ class CreateCheckoutSessionView(APIView):
                 money_to_pay=borrowing.fee,
             )
 
-        return Response(
-            {"checkout_url": checkout_session.url}, status=status.HTTP_200_OK
-        )
+        return Response({"checkout_url": checkout_session.url}, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -84,9 +78,7 @@ def payment_success(request: HttpRequest) -> Response:
     payment = Payment.objects.get(session_id=session_id)
     payment.status = Payment.Status.PAID
     payment.save()
-    return Response(
-        {"detail": "Payment was successful! Thank you."}, status=status.HTTP_200_OK
-    )
+    return Response({"detail": "Payment was successful! Thank you."}, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
