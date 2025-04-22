@@ -8,10 +8,11 @@ from user.models import Customer
 
 
 class Borrowing(models.Model):
-    # borrow_date = models.DateField(auto_now_add=True)
-    borrow_date = models.DateField()
+    borrow_date = models.DateField(auto_now_add=True)
     expected_return_date = models.DateField(auto_now=False, auto_now_add=False)
-    actual_return_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
+    actual_return_date = models.DateField(
+        auto_now=False, auto_now_add=False, blank=True, null=True
+    )
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     user = models.ForeignKey(Customer, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
@@ -21,16 +22,22 @@ class Borrowing(models.Model):
         super().clean()
         if self.expected_return_date and self.borrow_date:
             if self.expected_return_date < self.borrow_date:
-                raise ValidationError("Expected return date cannot be earlier than borrow date.")
+                raise ValidationError(
+                    "Expected return date cannot be earlier than borrow date."
+                )
 
     @property
     def calculate_total_fee(self):
-        if self.actual_return_date:
-            daily_fee = self.book.daily_fee
+        daily_fee = self.book.daily_fee
+
+        if self.expected_return_date == self.actual_return_date:
+            total_days = (self.expected_return_date - self.borrow_date).days
+        elif self.actual_return_date:
             total_days = (self.actual_return_date - self.borrow_date).days
-            total_fee = daily_fee * total_days
-            return total_fee
-        return Decimal("0.00")
+        else:
+            return Decimal("0.00")
+        total_fee = daily_fee * total_days
+        return total_fee
 
     def save(self, *args, **kwargs):
         is_new = self._state.adding
