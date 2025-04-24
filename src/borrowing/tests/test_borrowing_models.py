@@ -93,12 +93,12 @@ class TestBorrowingModel(TestCase):
         when a new Borrowing instance is created.
         """
         with patch.object(Book, "decrease_inventory") as mock_decrease:
-            borrowing = Borrowing.objects.create(
+            borrowing = Borrowing.objects.create(  # NOQA F841
                 book=self.book,
                 user=self.user,
                 borrow_date=datetime.date(2025, 4, 24),
                 expected_return_date=datetime.date(2025, 6, 22),
-            )  # NOQA F841
+            )
             mock_decrease.assert_called_once()
 
     def test_save_on_book_return_sets_fee_and_increases_inventory(self):
