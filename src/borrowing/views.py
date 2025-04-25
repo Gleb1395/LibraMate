@@ -4,9 +4,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from borrowing.models import Borrowing
-from borrowing.serializers import (BorrowingCreateSerializer,
-                                   BorrowingListSerializer,
-                                   BorrowingRetrieveSerializer)
+from borrowing.permissions import IsAdminOrIfAuthenticatedReadOnly
+from borrowing.serializers import (
+    BorrowingCreateSerializer,
+    BorrowingListSerializer,
+    BorrowingRetrieveSerializer,
+)
 
 
 class BorrowingView(
@@ -17,6 +20,7 @@ class BorrowingView(
     viewsets.GenericViewSet,
 ):
     queryset = Borrowing.objects.all().select_related("book", "user")
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
         if self.action == "retrieve":
@@ -29,14 +33,21 @@ class BorrowingView(
         queryset = self.queryset
         user_id = self.request.query_params.get("user_id")
         is_active = self.request.query_params.get("is_active")
-        if user_id is not None:
-            queryset = queryset.filter(user_id=user_id)
+
+        if not self.request.user.is_authenticated:
+            return queryset.none()
+
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(user=self.request.user)
+        else:
+            if user_id is not None:
+                queryset = queryset.filter(user_id=user_id)
 
         if is_active is not None:
             if is_active.lower() == "true":
-                queryset = queryset.filter(is_active=True)
+                queryset = queryset.filter(actual_return_date__isnull=True)
             elif is_active.lower() == "false":
-                queryset = queryset.filter(is_active=False)
+                queryset = queryset.filter(actual_return_date__isnull=False)
 
         return queryset
 
