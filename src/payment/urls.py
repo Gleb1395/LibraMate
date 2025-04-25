@@ -22,6 +22,6 @@ urlpatterns = [
     path("cancel/", payment_cancel, name="payment_cancel"),
     path("payment-list/", PaymentSessionListView.as_view(), name="payment_list"),
     path(
-        "payment-detail/<int:pk>/", PaymentDetailView.as_view(), name="payment-detail"
+        "payment-detail/<int:pk>/", PaymentDetailView.as_view(), name="payment_detail"
     ),
 ]
