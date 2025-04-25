@@ -6,8 +6,8 @@ class IsAdminOrIfAuthenticatedReadOnly(BasePermission):
         return bool(
             (
                 request.method in SAFE_METHODS
-                and request.user
-                and request.user.is_authenticated
+                and request.user  # NOQA W503
+                and request.user.is_authenticated  # NOQA W503
             )
             or (request.user and request.user.is_staff)  # NOQA W503
         )

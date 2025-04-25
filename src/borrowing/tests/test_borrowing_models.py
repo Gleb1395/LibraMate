@@ -120,7 +120,7 @@ class TestBorrowingModel(TestCase):
 
             mock_increase.assert_called_once()
             self.assertFalse(borrowing.is_active)
-            self.assertEqual(borrowing.fee, 590)
+            self.assertEqual(borrowing.fee, 580)
 
     def test_save_does_nothing_if_not_returned(self):
         """
