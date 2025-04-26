@@ -55,3 +55,9 @@ class UserRetrieveUpdateSerializer(serializers.ModelSerializer):
         model = get_user_model()
         read_only_fields = ("email",)
         fields = ("email", "first_name", "last_name", "phone", "username")
+
+
+class UserListRetrieveSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField(
+        required=False, help_text="Filter by user ID (admin only)"
+    )
