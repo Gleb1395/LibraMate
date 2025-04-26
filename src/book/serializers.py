@@ -9,3 +9,12 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = ("title", "author", "cover", "inventory", "daily_fee")
+
+
+class BookFilterSerializer(serializers.Serializer):
+    title = serializers.CharField(
+        required=False, help_text="Filter by title (partial match)"
+    )
+    author = serializers.CharField(
+        required=False, help_text="Filter by author (partial match)"
+    )

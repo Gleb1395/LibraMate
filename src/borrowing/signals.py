@@ -19,8 +19,8 @@ def send_borrowing_notification(sender, instance, created, **kwargs):
         if user.telegram_chat_id:
             bot.send_message(
                 user.telegram_chat_id,
-                f"Вы взяли книгу: {instance.book.title}\n"
-                f"Вернуть до: {instance.expected_return_date.strftime('%d.%m.%Y')}",
+                f"Ви взяли книгу: {instance.book.title}\n"
+                f"Повернути до: {instance.expected_return_date.strftime('%d.%m.%Y')}",
             )
 
 
@@ -31,6 +31,6 @@ def notify_book_returned(sender, instance, created, **kwargs):
         if user.telegram_chat_id:
             bot.send_message(
                 user.telegram_chat_id,
-                f"✅ Вы успешно вернули книгу: {instance.book.title}\n"
-                f"📆 Дата возврата: {instance.actual_return_date.strftime('%d.%m.%Y')}",
+                f"Ви успішно повернули книгу:{instance.book.title}\n"
+                f"Дата повернення:{instance.actual_return_date.strftime('%d.%m.%Y')}",
             )

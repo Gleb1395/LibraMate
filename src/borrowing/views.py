@@ -1,4 +1,5 @@
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -9,6 +10,7 @@ from borrowing.serializers import (
     BorrowingCreateSerializer,
     BorrowingListSerializer,
     BorrowingRetrieveSerializer,
+    BorrowingFilterSerializer,
 )
 
 
@@ -50,6 +52,10 @@ class BorrowingView(
                 queryset = queryset.filter(actual_return_date__isnull=False)
 
         return queryset
+
+    @extend_schema(parameters=[BorrowingFilterSerializer])
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     @action(detail=True, methods=["post"])
     def return_(self, request, pk=None):
