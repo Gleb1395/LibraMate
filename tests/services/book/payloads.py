@@ -2,11 +2,12 @@ import os
 import django
 
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-django.setup()
 import random
 from book.models import Book
 from faker import Faker
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+django.setup()
 
 
 fake = Faker("uk_UA")

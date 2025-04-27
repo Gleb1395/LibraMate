@@ -29,7 +29,7 @@ class UsersAPI(Helper):
         data = response.json()
         data.pop("access", None)
         data.pop("refresh", None)
-        model = UserModel(**data)
+        model = UserModel(**data)  # NOQA E402
         user = get_user_model().objects.create(**data)
         return user
 
