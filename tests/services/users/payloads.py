@@ -1,7 +1,7 @@
 import random
 
 from faker import Faker
-import phonenumbers
+
 
 fake = Faker("uk_UA")
 
