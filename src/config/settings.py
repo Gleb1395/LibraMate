@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "rest_framework",
     "debug_toolbar",
+    "drf_spectacular",
     "phonenumber_field",
     "book",
     "user",
@@ -90,6 +91,9 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
+        "TEST": {
+            "NAME": BASE_DIR / "db_test.sqlite3",
+        },
     }
 }
 
@@ -140,13 +144,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # REST
 REST_FRAMEWORK = {
     # YOUR SETTINGS
-    # "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {"anon": "50/minute", "user": "70/minute"},
-    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
 }
 # JWT
 SIMPLE_JWT = {
@@ -180,3 +186,11 @@ CELERY_BEAT_SCHEDULE = {
 # STRIPE
 STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY")
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+
+# SPECTACULAR
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Your Project API",
+    "DESCRIPTION": "Your project description",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}

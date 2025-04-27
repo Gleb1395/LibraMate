@@ -47,7 +47,7 @@ class Customer(AbstractUser):
 
     email = models.EmailField(
         _("email address"),
-        blank=True,
+        blank=False,
         unique=True,
         error_messages={
             "unique": _("A user with that email already exists."),

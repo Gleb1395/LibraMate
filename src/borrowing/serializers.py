@@ -61,3 +61,12 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
             "is_active",
             "fee",
         )
+
+
+class BorrowingFilterSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField(
+        required=False, help_text="Filter by user ID (admin only)"
+    )
+    is_active = serializers.BooleanField(
+        required=False, help_text="Filter by active borrowings"
+    )
